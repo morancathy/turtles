@@ -18,13 +18,22 @@ db.on('open', () => {
 });
 /* Middleware */
 app.use(express.json());
+
 if (process.env.NODE_ENV !== 'development'){
   app.use(express.static('public'))
 }
 
 /* Controller Goes Here Remove the test*/
 //Create
-app.post('/api/turtles', async (req, res)=> {
+app.get('/test', (req, res) => {
+  res.status(200).json({
+    website: 'My webstie',
+    info: 'not that much'
+  })
+})
+
+app.post('/api/turtles', async (req, res)=> { //using 'api' cause dont want routes here to interfere with routes on front end
+  //res.json(req.body)  //writing just this is to test that route is working
   try{
     const createdTurtle = await Turtle.create(req.body)
     res.status(200).json(createdTurtle)
@@ -35,10 +44,11 @@ app.post('/api/turtles', async (req, res)=> {
     })
   }
 })
-    //this is in place of error first callback.
+    //try/catch is in place of error first callback.
 
 // Read
 app.get('/api/turtles', async (req, res) => {
+  // res.json({"route": "index"}) //writing just this is to test that route is working
    try {
      const foundTurtles = await Turtle.find({})  //empty {} to filter by nothing
      res.status(200).json(foundTurtles)
@@ -52,6 +62,7 @@ app.get('/api/turtles', async (req, res) => {
 
 
 app.get('/api/turtles/:id', async (req, res) => {
+    // res.json({"route": "show"}) //writing just this is to test that route is working
   try {
     const foundTurtle = await Turtle.findById(req.params.id)
     res.status(200).json(foundTurtle)
@@ -96,7 +107,7 @@ app.delete('/api/turtles/:id', async (req, res) => {
 //LISTENER
 
 
-// for react router
+// for react router     //has a catch all route..any route that doesnt match the routes above, send the html file inside the pubic
 app.get('*', (req, res) => {
 	res.sendFile(path.resolve(path.join(__dirname, 'public', 'index.html')))
 })
